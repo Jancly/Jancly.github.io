@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://img-blog.csdn.net/20181002211620870?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzMzI3MjUz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
 <meta property="og:image" content="https://img-blog.csdn.net/20181002213756934?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzMzI3MjUz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
 <meta property="og:image" content="https://img-blog.csdn.net/20181002214115860?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzMzI3MjUz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
-<meta property="og:updated_time" content="2019-06-19T07:47:55.257Z">
+<meta property="og:updated_time" content="2019-06-19T09:45:55.195Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于deepin linux mysql 乱码">
 <meta name="twitter:description" content="deepin mysql 笔记">
@@ -202,7 +202,13 @@
 <p>deepin mysql 笔记<br><a id="more"></a></p>
 </blockquote>
 <h1 id="关于deepin-linux-mysql-乱码"><a href="#关于deepin-linux-mysql-乱码" class="headerlink" title="关于deepin linux mysql 乱码"></a>关于deepin linux mysql 乱码</h1><p>关于mysql数据库乱码问题,下面是插入一条数据出现的错误<br>|1| insert into user (username,password,nikename) value(‘333’,’eee’,’数据都’); |<br>|–|–|<br>| 2 | ERROR 1366 (HY000): Incorrect string value: ‘\xE6\x95\xB0\xE6\x8D\xAE…’ for column ‘nikename’ at row 1 |</p>
-<p>   刚开始以为是mysql的表没有设置为utf-8字符编码,进入MySQL的终端命令窗口,使用show create database user(表名称);命令,查看数据库编码方式<br>   <!-- more --><br><img src="https://img-blog.csdn.net/20181002210227189?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzMzI3MjUz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="在这里插入图片描述"><br>    如果上面不是utf-8编码,可以使用  alter database user(表名) default character set utf8;设置编码为utf-8.<br>    再插入数据,发现还是不行,下一步<br>    输入show variables like ‘%char%’;<br>    <img src="https://img-blog.csdn.net/20181002211620870?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzMzI3MjUz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="在这里插入图片描述"><br>发现character_set_server的编码是latin1,进入mysql文件夹的my.cnf文件里,添加下面内容,<strong>deepin linux系统在终端安装的MySQL文件在etc/mysql的文件夹中</strong><br>| 1 | [mysqld] |<br>|–|–|<br>|2  |  character_set_server=utf8|<br>修改好之后,重启mysql,使用/etc/init.d/mysql start命令启动成功,发现一个问题,使用systemctl start mysql.service命令启动失败,重启后继续插入数据,发现还是不行<br>再次百度,发现输入下面代码,发现有默认的字符集编码<br>|1| show create table user; |<br>|–|–|<br><img src="https://img-blog.csdn.net/20181002213756934?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzMzI3MjUz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="在这里插入图片描述"></p>
+<p>   刚开始以为是mysql的表没有设置为utf-8字符编码,进入MySQL的终端命令窗口,使用show create database user(表名称);命令,查看数据库编码方式</p>
+   <!-- more -->
+<p><img src="https://img-blog.csdn.net/20181002210227189?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzMzI3MjUz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt></p>
+<pre><code>如果上面不是utf-8编码,可以使用  alter database user(表名) default character set utf8;设置编码为utf-8.
+再插入数据,发现还是不行,下一步
+输入show variables like &apos;%char%&apos;;
+</code></pre><p> <img src="https://img-blog.csdn.net/20181002211620870?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzMzI3MjUz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="在这里插入图片描述"><br>发现character_set_server的编码是latin1,进入mysql文件夹的my.cnf文件里,添加下面内容,<strong>deepin linux系统在终端安装的MySQL文件在etc/mysql的文件夹中</strong><br>| 1 | [mysqld] |<br>|–|–|<br>|2  |  character_set_server=utf8|<br>修改好之后,重启mysql,使用/etc/init.d/mysql start命令启动成功,发现一个问题,使用systemctl start mysql.service命令启动失败,重启后继续插入数据,发现还是不行<br>再次百度,发现输入下面代码,发现有默认的字符集编码<br>|1| show create table user; |<br>|–|–|<br><img src="https://img-blog.csdn.net/20181002213756934?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzMzI3MjUz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="在这里插入图片描述"></p>
 <p>输入alter table <code>user</code> DEFAULT CHARACTER SET utf8,<br>modify <code>nikename</code> varchar(20) CHARACTER SET utf8 NOT NULL,修改默认的字符集编码<br><img src="https://img-blog.csdn.net/20181002214115860?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzMzI3MjUz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="在这里插入图片描述"><br>修改好之后插入数据,发现可以插入中文数据了.</p>
 <p>今天笔记就写到这里,如果有什么误导大家的,抱歉了</p>
 
@@ -489,11 +495,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">PLC</a>
+                <a href="javascript:void(0)" class="js-tag color4">vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">vue</a>
+                <a href="javascript:void(0)" class="js-tag color5">html</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -505,7 +511,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">html</a>
+                <a href="javascript:void(0)" class="js-tag color5">模板引擎</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -517,11 +523,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">技术支持</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">浏览器</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">技术支持</a>
+                <a href="javascript:void(0)" class="js-tag color4">PLC</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">机械设计</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">机械</a>
               </li>
             
             <div class="clearfix"></div>
